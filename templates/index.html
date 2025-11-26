@@ -12,21 +12,6 @@
     <style>
         body {margin:0;background:#0f0f23;color:white;font-family:'Noto Sans KR',sans-serif;overflow-x:hidden}
 
-        /* 모바일 스크롤 힌트 */
-        @media(max-width:600px){
-            .scroll-hint{
-                text-align:center;
-                font-size:1rem;
-                color:#ccc;
-                margin-top:-20px;
-                margin-bottom:20px;
-                animation:blink 1.5s infinite;
-            }
-        }
-        @keyframes blink{
-            50%{opacity:0.4;}
-        }
-
         .hero{
             min-height:100vh;
             background:linear-gradient(135deg,#0f0f23 0%,#1a1a3a 50%,#2d1b69 100%);
@@ -51,7 +36,6 @@
             padding:10px 24px;border-radius:50px;font-weight:500;margin:4px
         }
 
-        /* 시냅스 스타일 */
         .tagline{
             margin-top:40px;
             font-size:1.2rem;
@@ -68,6 +52,37 @@
             text-shadow:0 0 12px rgba(160,160,255,0.4);
         }
 
+        /* 버튼 디자인 개선 */
+        .btn-opt{
+            border:2px solid #5561ff;
+            background:rgba(255,255,255,0.05);
+            color:white;
+            font-size:1.25rem;
+            padding:14px 28px;
+            border-radius:14px;
+            margin:10px;
+            transition:0.25s;
+        }
+        .btn-opt:hover{
+            background:#5561ff;
+        }
+        .btn-opt.active{
+            background:#5561ff;
+            box-shadow:0 0 12px rgba(85,97,255,0.7);
+        }
+
+        .btn-step{
+            background:#6a5acd;
+            color:white;
+            padding:14px 38px;
+            font-size:1.25rem;
+            border-radius:14px;
+            border:none;
+            transition:.25s
+        }
+        .btn-step:hover{background:#7a6df0}
+
+        /* 결과창 색감 */
         .result-high{
             background:linear-gradient(135deg,#ff4d4d,#ff7b6b,#ff9966) !important;
         }
@@ -83,19 +98,9 @@
             padding:25px;
             margin-top:15px;
         }
-
-        /* 위험군 기준 박스 */
-        .risk-guide-box {
-            background:rgba(255,255,255,0.08);
-            padding:18px;
-            border-radius:10px;
-            margin-bottom:25px;
-            border-left:4px solid #66aaff;
-            font-size:1.1rem;
-        }
-
     </style>
 </head>
+
 <body>
 
 <!-- HERO -->
@@ -104,89 +109,85 @@
 
         <h1 class="title"><span class="stroke">Stroke</span><span class="guard">Guard</span> AI</h1>
 
-        <p class="subtitle">국내 500만 명 + 미국 라벨링 데이터로 학습한<br>차세대 뇌졸중 예측 AI</p>
+        <p class="subtitle">국내 500만 명 + 미국 CDC NHANES 라벨링 기반<br>차세대 뇌졸중 위험 예측 모델</p>
 
         <div class="badges">
             <span class="badge">AI 기반 위험도 예측</span>
             <span class="badge">뇌졸중 조기 발견 특화</span>
-            <span class="badge">실시간 AI 주치의</span>
+            <span class="badge">실시간 맞춤형 코칭</span>
         </div>
 
         <p class="tagline text-center">
             <span class="icon">SYNAPSE</span>작은 변화가 큰 미래를 만듭니다
         </p>
 
-        <p class="scroll-hint d-md-none">⬇ 아래로 스크롤해 설문을 진행하세요</p>
+        <p class="mt-4 text-center" style="font-size:1rem;opacity:0.7;">
+            ⬇ 아래로 스크롤하여 건강 정보를 입력하세요
+        </p>
 
     </div>
 </div>
+
+
 <!-- SURVEY -->
 <div class="container my-5" id="survey">
     <div class="row justify-content-center">
         <div class="col-lg-9">
             <div class="card p-5">
 
-                <!-- 위험군 기준 안내 (추가) -->
-                <div class="risk-guide-box mb-4">
-                    <strong>📌 모델 기반 뇌졸중 위험군 분류 기준</strong><br><br>
-                    ● <b>고위험군</b>: 예측 확률 ≥ <b>66%</b><br>
-                    ● <b>저위험군</b>: 예측 확률 < 66%<br><br>
-                    기준값(Threshold = 0.66)은 민감도(Recall)를 최대화하며<br>
-                    실제 고위험자를 놓치지 않기 위한 최적값입니다.
-                </div>
-
                 <div class="progress mb-5"><div class="progress-bar" id="prog" style="width:12.5%"></div></div>
                 <h2 class="text-center mb-5" id="question">1/8 성별을 선택해주세요</h2>
 
+                <!-- 1 -->
                 <div id="step1" class="text-center mb-4">
-                    <button class="btn btn-opt active" data-value="1">남성</button>
-                    <button class="btn btn-opt" data-value="2">여성</button>
+                    <button class="btn-opt active" data-value="1">남성</button>
+                    <button class="btn-opt" data-value="2">여성</button>
                 </div>
 
+                <!-- 2 -->
                 <div id="step2" class="d-none text-center">
                     <input type="number" class="form-control form-control-lg text-center" id="age" placeholder="만 나이 (예: 65)">
                 </div>
 
+                <!-- 3 -->
                 <div id="step3" class="d-none text-center">
                     <input type="number" class="form-control form-control-lg text-center" id="height" placeholder="키 (cm)">
                     <input type="number" class="form-control form-control-lg text-center mt-3" id="weight" placeholder="몸무게 (kg)">
                 </div>
 
-                <div id="step4" class="d-none text-center">
-                    <input type="number" class="form-control form-control-lg text-center" id="sbp" placeholder="수축기 혈압 (예: 140)">
-                </div>
+                <!-- 4 -->
+                <div id="step4" class="d-none text-center"><input type="number" class="form-control form-control-lg text-center" id="sbp" placeholder="수축기 혈압 (예: 140)"></div>
 
-                <div id="step5" class="d-none text-center">
-                    <input type="number" class="form-control form-control-lg text-center" id="dbp" placeholder="이완기 혈압 (예: 90)">
-                </div>
+                <!-- 5 -->
+                <div id="step5" class="d-none text-center"><input type="number" class="form-control form-control-lg text-center" id="dbp" placeholder="이완기 혈압 (예: 90)"></div>
 
-                <div id="step6" class="d-none text-center">
-                    <input type="number" class="form-control form-control-lg text-center" id="glucose" placeholder="공복 혈당 (예: 120)">
-                </div>
+                <!-- 6 -->
+                <div id="step6" class="d-none text-center"><input type="number" class="form-control form-control-lg text-center" id="glucose" placeholder="공복 혈당 (예: 120)"></div>
 
+                <!-- 7 -->
                 <div id="step7" class="d-none text-center mb-4">
-                    <p class="fs-3 fw-bold mb-4">흡연하시나요?</p>
-                    <button class="btn btn-opt active" data-value="0">아니오</button>
-                    <button class="btn btn-opt" data-value="1">예</button>
+                    <p class="fs-3 fw-bold mb-4">흡연 여부를 선택해주세요</p>
+                    <button class="btn-opt active" data-value="0">비흡연</button>
+                    <button class="btn-opt" data-value="1">흡연</button>
                 </div>
 
+                <!-- 8 -->
                 <div id="step8" class="d-none text-center mb-4">
-                    <p class="fs-3 fw-bold mb-4">음주하시나요? (주 1회 기준)</p>
-                    <button class="btn btn-opt active" data-value="0">주 1회 미만</button>
-                    <button class="btn btn-opt" data-value="1">주 1회 이상</button>
+                    <p class="fs-3 fw-bold mb-4">음주 여부 (주 1회 이상)</p>
+                    <button class="btn-opt active" data-value="0">주 1회 미만</button>
+                    <button class="btn-opt" data-value="1">주 1회 이상</button>
                 </div>
 
                 <div class="text-center mt-5">
                     <button id="prev" class="btn btn-outline-secondary btn-lg me-4 d-none">이전</button>
-                    <button id="next" class="btn btn-step">다음</button>
-                    <button id="submit" class="btn btn-danger btn-lg d-none">지금 예측하기</button>
+                    <button id="next" class="btn-step">다음</button>
+                    <button id="submit" class="btn btn-danger btn-lg d-none">AI 예측하기</button>
                 </div>
 
             </div>
         </div>
     </div>
 </div>
-
 
 <!-- RESULT -->
 <div class="container my-5 d-none" id="result">
@@ -205,18 +206,21 @@ const questions = [
     "수축기 혈압을 입력해주세요",
     "이완기 혈압을 입력해주세요",
     "공복 혈당을 입력해주세요",
-    "흡연하시나요?",
-    "음주하시나요? (주 1회 기준)"
+    "흡연 여부를 선택해주세요",
+    "음주 빈도를 선택해주세요"
 ];
 
 let step = 1;
 const data = { gender:1, smoking:0, drinking:0 };
 
-document.querySelectorAll(".btn-opt").forEach(b=>{
-    b.onclick = ()=> {
-        b.parentNode.querySelectorAll(".btn-opt").forEach(x=>x.classList.remove("active"));
-        b.classList.add("active");
-    }
+/* BUTTON ACTIVE FIX – STEP SCOPE 분리 */
+["step1","step7","step8"].forEach(id=>{
+    document.querySelectorAll(`#${id} .btn-opt`).forEach(btn=>{
+        btn.onclick = ()=>{
+            document.querySelectorAll(`#${id} .btn-opt`).forEach(x=>x.classList.remove("active"));
+            btn.classList.add("active");
+        };
+    });
 });
 
 document.getElementById("next").onclick = ()=>{
@@ -234,7 +238,7 @@ document.getElementById("next").onclick = ()=>{
     if(step===3){
         let h = document.getElementById("height").value;
         let w = document.getElementById("weight").value;
-        if(!h || !w){ alert("키와 몸무게를 모두 입력해주세요"); return; }
+        if(!h || !w){ alert("키와 몸무게를 입력해주세요"); return; }
         data.bmi = (w / ((h/100)**2)).toFixed(1);
     }
 
@@ -308,14 +312,25 @@ document.getElementById("submit").onclick = ()=>{
         card.classList.remove("result-high","result-low");
         card.classList.add(res.risk_class);
 
+        const thresholdInfo = `
+📌 <strong>모델 기반 뇌졸중 위험군 기준</strong><br><br>
+● <b>고위험군</b>: 예측 확률 ≥ 66%<br>
+● <b>저위험군</b>: 예측 확률 &lt; 66%<br><br>
+<small>※ Threshold=0.66 (민감도·재현율 최적화를 위한 기준값)</small>
+        `;
+
         card.innerHTML = `
             <h1 class="display-1 fw-bold mb-3">${res.prob}%</h1>
-            <h2 class="display-5 mb-4">${res.risk_text}군</h2>
+            <h2 class="display-5 mb-3">${res.risk_text}군</h2>
 
             <div class="result-text-box">${res.advice}</div>
 
+            <div class="mt-4 p-3" style="background:rgba(0,0,0,0.15);border-radius:12px;font-size:1.1rem;">
+                ${thresholdInfo}
+            </div>
+
             <p class="mt-4" style="font-size:1rem;opacity:0.85;">
-                조언 생성 모델: <strong>Groq LLaMA-3.1-8B-Instant</strong>
+                조언 생성 AI 모델: <strong>Groq LLaMA-3.1-8B-Instant</strong>
             </p>
 
             <button class="btn btn-light btn-lg mt-5 px-5" onclick="location.reload()">다시 검사하기</button>
