@@ -1,182 +1,234 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>StrokeGuard AI - 뇌졸중 위험 예측</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StrokeGuard AI – 뇌졸중 위험 예측</title>
 
     <style>
         body {
-            background:#f2f4f7;
-            font-family: 'Noto Sans KR', sans-serif;
+            font-family: 'Pretendard', sans-serif;
+            background: #f5f6fa;
+            margin: 0;
+            padding: 0;
         }
 
-        .container-box {
-            max-width: 540px;
-            margin: 20px auto;
-            background: white;
+        .container {
+            max-width: 480px;
+            margin: auto;
             padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            background: white;
+            margin-top: 10px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
         }
 
-        .scroll-hint {
+        h2 {
             text-align: center;
+            font-size: 23px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .input-box {
             margin-bottom: 15px;
+        }
+
+        .input-box label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .input-box input,
+        .input-box select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
             font-size: 15px;
-            color: #6c757d;
+        }
+
+        .btn {
+            width: 100%;
+            background: #0050ff;
+            color: white;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 17px;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background: #003ed6;
         }
 
         .result-box {
-            margin-top: 25px;
-            padding: 22px;
-            border-radius: 14px;
-            font-size: 16px;
-            line-height: 1.6;
-            min-height: 260px; /* 요청 반영: 결과 박스 크기 증가 */
-            white-space: pre-line;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            display: none;
         }
 
         .result-low {
-            background: #e8f5e9;
-            color: #1b5e20;
-            border-left: 8px solid #43a047;
+            background: #e7f3ff;
+            border-left: 6px solid #1e90ff;
         }
-        .result-mid {
-            background: #fff3cd;
-            color: #7a5f00;
-            border-left: 8px solid #ffb300;
-        }
+
         .result-high {
-            background: #ffebee;
-            color: #b71c1c;
-            border-left: 8px solid #e53935;
+            background: #ffe8e8;
+            border-left: 6px solid #ff3b3b;
         }
 
-        .btn-main {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 17px;
-            font-weight: 600;
+        .advice-text {
+            margin-top: 15px;
+            font-size: 15px;
+            line-height: 1.45;
+            white-space: pre-line;
         }
 
-        .desc-box {
+        /* 스크롤 힌트 */
+        .scroll-hint {
+            text-align: center;
+            color: #666;
+            margin-top: 10px;
+            margin-bottom: -5px;
+            font-size: 13px;
+        }
+
+        /* 위험군 기준 안내 */
+        .risk-guide {
             background: #f8f9fa;
             padding: 13px;
             border-radius: 10px;
-            margin-bottom: 18px;
-            font-size: 15px;
+            border-left: 5px solid #3566ff;
+            margin-top: 15px;
+            margin-bottom: 22px;
+        }
+
+        .risk-guide p {
+            margin: 0;
+            font-size: 14px;
         }
     </style>
+
 </head>
+
 <body>
 
-<div class="container-box">
+    <div class="container">
+        <h2>StrokeGuard AI<br>뇌졸중 위험 예측</h2>
 
-    <div class="scroll-hint">
-        아래로 스크롤하여 설문을 진행하세요 ↓
+        <div class="scroll-hint">⬇ 아래로 스크롤하여 입력 후 결과를 확인하세요 ⬇</div>
+
+        <!-- 위험군 기준 명시 -->
+        <div class="risk-guide">
+            <p>
+                📌 <b>모델 기반 위험군 분류 기준</b><br><br>
+                ● <b>고위험</b>: 예측 확률 ≥ <b>66%</b><br>
+                ● <b>저위험</b>: 예측 확률 < <b>66%</b><br><br>
+                ※ 이 기준은 LightGBM 모델 검증에서 민감도(Recall)를 최대 확보한
+                최적 Threshold = <b>0.66</b> 분석값을 근거로 합니다.
+            </p>
+        </div>
+
+        <!-- 입력폼 -->
+        <div class="input-box">
+            <label>성별</label>
+            <select id="gender">
+                <option value="1">남성</option>
+                <option value="0">여성</option>
+            </select>
+        </div>
+
+        <div class="input-box">
+            <label>만 나이</label>
+            <input type="number" id="age" placeholder="예: 45" />
+        </div>
+
+        <div class="input-box">
+            <label>BMI</label>
+            <input type="number" id="bmi" step="0.1" placeholder="예: 24.6" />
+        </div>
+
+        <div class="input-box">
+            <label>수축기 혈압 (mmHg)</label>
+            <input type="number" id="sbp" placeholder="예: 135" />
+        </div>
+
+        <div class="input-box">
+            <label>이완기 혈압 (mmHg)</label>
+            <input type="number" id="dbp" placeholder="예: 85" />
+        </div>
+
+        <div class="input-box">
+            <label>공복 혈당 (mg/dL)</label>
+            <input type="number" id="glucose" placeholder="예: 110" />
+        </div>
+
+        <div class="input-box">
+            <label>흡연 여부</label>
+            <select id="smoking">
+                <option value="0">비흡연</option>
+                <option value="1">흡연</option>
+            </select>
+        </div>
+
+        <div class="input-box">
+            <label>음주 여부 (주 1회 이상 기준)</label>
+            <select id="drinking">
+                <option value="0">주 1회 미만</option>
+                <option value="1">주 1회 이상</option>
+            </select>
+        </div>
+
+        <button class="btn" onclick="predict()">예측하기</button>
+
+        <!-- 결과 박스 -->
+        <div id="result-box" class="result-box">
+            <h3 id="risk-title"></h3>
+            <p id="prob-text"></p>
+            <div class="advice-text" id="advice"></div>
+        </div>
+
     </div>
 
-    <h3 class="text-center mb-3"><b>StrokeGuard AI</b></h3>
-    <p class="text-center text-muted mb-4">뇌졸중 발병 위험 예측 시스템</p>
+    <script>
+        function predict() {
+            const payload = {
+                gender: document.getElementById("gender").value,
+                age: document.getElementById("age").value,
+                bmi: document.getElementById("bmi").value,
+                sbp: document.getElementById("sbp").value,
+                dbp: document.getElementById("dbp").value,
+                glucose: document.getElementById("glucose").value,
+                smoking: document.getElementById("smoking").value,
+                drinking: document.getElementById("drinking").value
+            };
 
-    <div class="desc-box">
-        <b>입력 기준 안내</b><br>
-        - 음주 여부: <b>주 1회 이상 음주 시 ‘예’</b><br>
-        - 나이: <b>만나이</b><br>
-        - 정상/위험/고위험 기준:<br>
-        &nbsp;&nbsp;● 정상: 예측확률 < 40%<br>
-        &nbsp;&nbsp;● 위험: 40% ~ 66%<br>
-        &nbsp;&nbsp;● 고위험: 66% 이상<br>
-    </div>
+            fetch("/predict", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    const box = document.getElementById("result-box");
+                    box.style.display = "block";
 
-    <!-- ==================== FORM ==================== -->
-    <form id="riskForm">
+                    document.getElementById("risk-title").innerText = `결과: ${data.risk_text}`;
+                    document.getElementById("prob-text").innerText = `예측 확률: ${data.prob}%`;
+                    document.getElementById("advice").innerText = data.advice;
 
-        <label class="form-label mt-2">성별</label>
-        <select class="form-select" id="gender">
-            <option value="1">남성</option>
-            <option value="0">여성</option>
-        </select>
-
-        <label class="form-label mt-3">나이 (만나이)</label>
-        <input type="number" class="form-control" id="age" required>
-
-        <label class="form-label mt-3">BMI</label>
-        <input type="number" step="0.1" class="form-control" id="bmi" required>
-
-        <label class="form-label mt-3">수축기 혈압(SBP)</label>
-        <input type="number" class="form-control" id="sbp" required>
-
-        <label class="form-label mt-3">이완기 혈압(DBP)</label>
-        <input type="number" class="form-control" id="dbp" required>
-
-        <label class="form-label mt-3">공복 혈당</label>
-        <input type="number" class="form-control" id="glucose" required>
-
-        <label class="form-label mt-3">흡연 여부</label>
-        <select class="form-select" id="smoking">
-            <option value="1">흡연</option>
-            <option value="0">비흡연</option>
-        </select>
-
-        <label class="form-label mt-3">음주 여부<br>(주 1회 이상은 ‘예’로 간주)</label>
-        <select class="form-select" id="drinking">
-            <option value="1">예</option>
-            <option value="0">아니오</option>
-        </select>
-
-        <button type="submit" class="btn btn-primary btn-main mt-4">
-            검사하기
-        </button>
-
-    </form>
-
-    <div id="result" class="result-box mt-4" style="display:none;">
-    </div>
-
-</div>
-
-<!-- ==================== SCRIPT ==================== -->
-<script>
-document.getElementById("riskForm").addEventListener("submit", async function(e){
-    e.preventDefault();
-
-    const payload = {
-        gender:    document.getElementById("gender").value,
-        age:       document.getElementById("age").value,
-        bmi:       document.getElementById("bmi").value,
-        sbp:       document.getElementById("sbp").value,
-        dbp:       document.getElementById("dbp").value,
-        glucose:   document.getElementById("glucose").value,
-        smoking:   document.getElementById("smoking").value,
-        drinking:  document.getElementById("drinking").value,
-    };
-
-    const res = await fetch("/predict", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(payload)
-    });
-
-    const data = await res.json();
-
-    const box = document.getElementById("result");
-    box.style.display = "block";
-    box.className = "result-box " + data.risk_class;
-
-    box.innerHTML =
-        "<b>🔎 예측 결과</b><br>" +
-        "예측 확률: <b>" + data.prob + "%</b><br>" +
-        "위험도: <b>" + data.risk_text + "</b><br><br>" +
-        "<b>생활 조언</b><br>" + data.advice + "<br><br>" +
-        "<small>※ 본 모델은 혈압·혈당·BMI·흡연·음주·나이 등 의학적 근거가 확인된 지표를 기반으로 예측합니다.<br>" +
-        "   간단한 문항이라도 뇌졸중과 연관성이 높은 핵심 변수들로 구성되어 있어 신뢰 가능한 결과를 제공합니다.</small>";
-});
-</script>
+                    box.className = "result-box " + data.risk_class;
+                });
+        }
+    </script>
 
 </body>
+
 </html>
