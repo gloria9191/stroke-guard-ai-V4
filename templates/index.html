@@ -1,291 +1,334 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StrokeGuard AI – 뇌졸중 위험 예측</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>StrokeGuard AI</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
     <style>
-        body {
-            font-family: 'Pretendard', sans-serif;
-            background: #eef3f9;
-            margin: 0;
-            padding: 0;
+        body {margin:0;background:#0f0f23;color:white;font-family:'Noto Sans KR',sans-serif;overflow-x:hidden}
+
+        /* 모바일 스크롤 힌트 */
+        @media(max-width:600px){
+            .scroll-hint{
+                text-align:center;
+                font-size:1rem;
+                color:#ccc;
+                margin-top:-20px;
+                margin-bottom:20px;
+                animation:blink 1.5s infinite;
+            }
+        }
+        @keyframes blink{
+            50%{opacity:0.4;}
         }
 
-        .container {
-            max-width: 480px;
-            margin: auto;
-            padding: 25px;
-            background: white;
-            margin-top: 20px;
-            border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        .hero{
+            min-height:100vh;
+            background:linear-gradient(135deg,#0f0f23 0%,#1a1a3a 50%,#2d1b69 100%);
+            display:flex;align-items:center;justify-content:center;position:relative
+        }
+        .hero::before{
+            content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+            background:url('https://images.unsplash.com/photo-1638207213803-3c093c7cd506?auto=format&fit=crop&q=80') center/cover;opacity:0.15
+        }
+        .hero-content{position:relative;z-index:2;max-width:900px;text-align:center;padding:0 20px}
+
+        .title{font-size:clamp(4rem,10vw,7rem);font-weight:900;letter-spacing:-3px;margin:0 0 1.5rem;line-height:0.9;}
+        .stroke{background:linear-gradient(90deg,#ff6b6b,#feca57);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+        .guard{color:#a29bfe;text-shadow:0 0 30px rgba(162,155,254,0.6)}
+
+        .subtitle{font-size:1.5rem;font-weight:300;margin-bottom:3rem;opacity:0.9;line-height:1.7}
+
+        .badge{
+            background:rgba(255,255,255,0.12);
+            backdrop-filter:blur(10px);
+            border:1px solid rgba(255,255,255,0.2);
+            padding:10px 24px;border-radius:50px;font-weight:500;margin:4px
         }
 
-        h2 {
-            text-align: center;
-            font-size: 24px;
-            font-weight: 800;
-            margin-bottom: 10px;
-            color: #1a3d8f;
+        /* 시냅스 스타일 */
+        .tagline{
+            margin-top:40px;
+            font-size:1.2rem;
+            opacity:0.85;
+            letter-spacing:1px;
+        }
+        .tagline .icon{
+            font-weight:700;
+            font-size:1.3rem;
+            margin-right:8px;
+            background:linear-gradient(135deg,#8ec5fc,#e0c3fc);
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            text-shadow:0 0 12px rgba(160,160,255,0.4);
         }
 
-        .progress-bar-box {
-            width: 100%;
-            height: 8px;
-            background: #e4e8ef;
-            border-radius: 20px;
-            margin-top: 25px;
+        .result-high{
+            background:linear-gradient(135deg,#ff4d4d,#ff7b6b,#ff9966) !important;
+        }
+        .result-low{
+            background:linear-gradient(135deg,#3aa0ff,#5bbcff,#6bc1ff) !important;
         }
 
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background: #4c7dff;
-            border-radius: 20px;
-            transition: 0.3s;
+        .result-text-box{
+            word-break:break-word;
+            white-space:pre-line;
+            font-size:1.45rem;
+            line-height:1.8;
+            padding:25px;
+            margin-top:15px;
         }
 
-        .page {
-            display: none;
+        /* 위험군 기준 박스 */
+        .risk-guide-box {
+            background:rgba(255,255,255,0.08);
+            padding:18px;
+            border-radius:10px;
+            margin-bottom:25px;
+            border-left:4px solid #66aaff;
+            font-size:1.1rem;
         }
 
-        .page.active {
-            display: block;
-        }
-
-        .input-box {
-            margin-top: 25px;
-        }
-
-        label {
-            font-size: 15px;
-            font-weight: 600;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid #bfc7d8;
-            margin-top: 8px;
-            font-size: 15px;
-        }
-
-        .btn {
-            width: 100%;
-            background: #3368ff;
-            color: white;
-            padding: 14px;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 17px;
-            margin-top: 25px;
-            font-weight: 700;
-        }
-
-        .btn:hover {
-            background: #1e4ed9;
-        }
-
-        .risk-guide {
-            background: #f5f7ff;
-            padding: 15px;
-            border-radius: 12px;
-            border-left: 6px solid #4c6fff;
-            margin-top: 20px;
-        }
-
-        .result-box {
-            margin-top: 30px;
-            padding: 22px;
-            border-radius: 14px;
-            display: none;
-        }
-
-        .result-low {
-            background: #e8f2ff;
-            border-left: 7px solid #1e6cff;
-        }
-
-        .result-high {
-            background: #ffe5e5;
-            border-left: 7px solid #ff3b3b;
-        }
-
-        .advice-text {
-            margin-top: 15px;
-            font-size: 15px;
-            line-height: 1.5;
-            white-space: pre-line;
-        }
-
-        .scroll-hint {
-            text-align: center;
-            margin-top: 10px;
-            color: #7b879a;
-            font-size: 13px;
-        }
     </style>
 </head>
-
 <body>
 
-    <div class="container">
-        <h2>StrokeGuard AI</h2>
-        <div class="scroll-hint">⬇ 아래로 스크롤하여 설문을 진행하세요</div>
+<!-- HERO -->
+<div class="hero">
+    <div class="hero-content">
 
-        <div class="risk-guide">
-            <b>📌 모델 기반 위험군 분류 기준</b><br><br>
-            ● <b>고위험</b>: 예측 확률 ≥ 66%<br>
-            ● <b>저위험</b>: 예측 확률 < 66%<br><br>
-            ※ Threshold = <b>0.66</b> (LightGBM 최적 민감도 기준)
+        <h1 class="title"><span class="stroke">Stroke</span><span class="guard">Guard</span> AI</h1>
+
+        <p class="subtitle">국내 500만 명 + 미국 라벨링 데이터로 학습한<br>차세대 뇌졸중 예측 AI</p>
+
+        <div class="badges">
+            <span class="badge">AI 기반 위험도 예측</span>
+            <span class="badge">뇌졸중 조기 발견 특화</span>
+            <span class="badge">실시간 AI 주치의</span>
         </div>
 
-        <div class="progress-bar-box">
-            <div class="progress-bar" id="progress"></div>
-        </div>
+        <p class="tagline text-center">
+            <span class="icon">SYNAPSE</span>작은 변화가 큰 미래를 만듭니다
+        </p>
 
-        <!-- 페이지 1 -->
-        <div class="page active" id="page1">
-            <div class="input-box">
-                <label>성별</label>
-                <select id="gender">
-                    <option value="1">남성</option>
-                    <option value="0">여성</option>
-                </select>
-            </div>
-            <button class="btn" onclick="nextPage()">다음</button>
-        </div>
-
-        <!-- 페이지 2 -->
-        <div class="page" id="page2">
-            <div class="input-box">
-                <label>만 나이</label>
-                <input id="age" type="number" placeholder="예: 45">
-            </div>
-            <button class="btn" onclick="nextPage()">다음</button>
-        </div>
-
-        <!-- 페이지 3 -->
-        <div class="page" id="page3">
-            <div class="input-box">
-                <label>BMI</label>
-                <input id="bmi" type="number" step="0.1" placeholder="예: 24.5">
-            </div>
-            <button class="btn" onclick="nextPage()">다음</button>
-        </div>
-
-        <!-- 페이지 4 -->
-        <div class="page" id="page4">
-            <div class="input-box">
-                <label>수축기 혈압</label>
-                <input id="sbp" type="number" placeholder="예: 130">
-            </div>
-            <button class="btn" onclick="nextPage()">다음</button>
-        </div>
-
-        <!-- 페이지 5 -->
-        <div class="page" id="page5">
-            <div class="input-box">
-                <label>이완기 혈압</label>
-                <input id="dbp" type="number" placeholder="예: 85">
-            </div>
-            <button class="btn" onclick="nextPage()">다음</button>
-        </div>
-
-        <!-- 페이지 6 -->
-        <div class="page" id="page6">
-            <div class="input-box">
-                <label>공복 혈당</label>
-                <input id="glucose" type="number" placeholder="예: 110">
-            </div>
-            <button class="btn" onclick="nextPage()">다음</button>
-        </div>
-
-        <!-- 페이지 7 -->
-        <div class="page" id="page7">
-            <div class="input-box">
-                <label>흡연 여부</label>
-                <select id="smoking">
-                    <option value="0">비흡연</option>
-                    <option value="1">흡연</option>
-                </select>
-            </div>
-            <button class="btn" onclick="nextPage()">다음</button>
-        </div>
-
-        <!-- 페이지 8 -->
-        <div class="page" id="page8">
-            <div class="input-box">
-                <label>음주 여부 (주 1회 이상 기준)</label>
-                <select id="drinking">
-                    <option value="0">주 1회 미만</option>
-                    <option value="1">주 1회 이상</option>
-                </select>
-            </div>
-            <button class="btn" onclick="predict()">예측하기</button>
-        </div>
-
-        <!-- 결과 페이지 -->
-        <div id="result-box" class="result-box">
-            <h3 id="risk-title"></h3>
-            <p id="prob-text"></p>
-            <div class="advice-text" id="advice"></div>
-        </div>
+        <p class="scroll-hint d-md-none">⬇ 아래로 스크롤해 설문을 진행하세요</p>
 
     </div>
+</div>
+<!-- SURVEY -->
+<div class="container my-5" id="survey">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card p-5">
 
-    <script>
-        let current = 1;
+                <!-- 위험군 기준 안내 (추가) -->
+                <div class="risk-guide-box mb-4">
+                    <strong>📌 모델 기반 뇌졸중 위험군 분류 기준</strong><br><br>
+                    ● <b>고위험군</b>: 예측 확률 ≥ <b>66%</b><br>
+                    ● <b>저위험군</b>: 예측 확률 < 66%<br><br>
+                    기준값(Threshold = 0.66)은 민감도(Recall)를 최대화하며<br>
+                    실제 고위험자를 놓치지 않기 위한 최적값입니다.
+                </div>
 
-        function nextPage() {
-            document.getElementById(`page${current}`).classList.remove("active");
-            current++;
-            document.getElementById(`page${current}`).classList.add("active");
+                <div class="progress mb-5"><div class="progress-bar" id="prog" style="width:12.5%"></div></div>
+                <h2 class="text-center mb-5" id="question">1/8 성별을 선택해주세요</h2>
 
-            document.getElementById("progress").style.width = (current - 1) * 12.5 + "%";
+                <div id="step1" class="text-center mb-4">
+                    <button class="btn btn-opt active" data-value="1">남성</button>
+                    <button class="btn btn-opt" data-value="2">여성</button>
+                </div>
+
+                <div id="step2" class="d-none text-center">
+                    <input type="number" class="form-control form-control-lg text-center" id="age" placeholder="만 나이 (예: 65)">
+                </div>
+
+                <div id="step3" class="d-none text-center">
+                    <input type="number" class="form-control form-control-lg text-center" id="height" placeholder="키 (cm)">
+                    <input type="number" class="form-control form-control-lg text-center mt-3" id="weight" placeholder="몸무게 (kg)">
+                </div>
+
+                <div id="step4" class="d-none text-center">
+                    <input type="number" class="form-control form-control-lg text-center" id="sbp" placeholder="수축기 혈압 (예: 140)">
+                </div>
+
+                <div id="step5" class="d-none text-center">
+                    <input type="number" class="form-control form-control-lg text-center" id="dbp" placeholder="이완기 혈압 (예: 90)">
+                </div>
+
+                <div id="step6" class="d-none text-center">
+                    <input type="number" class="form-control form-control-lg text-center" id="glucose" placeholder="공복 혈당 (예: 120)">
+                </div>
+
+                <div id="step7" class="d-none text-center mb-4">
+                    <p class="fs-3 fw-bold mb-4">흡연하시나요?</p>
+                    <button class="btn btn-opt active" data-value="0">아니오</button>
+                    <button class="btn btn-opt" data-value="1">예</button>
+                </div>
+
+                <div id="step8" class="d-none text-center mb-4">
+                    <p class="fs-3 fw-bold mb-4">음주하시나요? (주 1회 기준)</p>
+                    <button class="btn btn-opt active" data-value="0">주 1회 미만</button>
+                    <button class="btn btn-opt" data-value="1">주 1회 이상</button>
+                </div>
+
+                <div class="text-center mt-5">
+                    <button id="prev" class="btn btn-outline-secondary btn-lg me-4 d-none">이전</button>
+                    <button id="next" class="btn btn-step">다음</button>
+                    <button id="submit" class="btn btn-danger btn-lg d-none">지금 예측하기</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- RESULT -->
+<div class="container my-5 d-none" id="result">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card p-5 text-white text-center" id="resultCard"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const questions = [
+    "성별을 선택해주세요",
+    "만 나이를 입력해주세요",
+    "키와 몸무게를 입력해주세요 (BMI 자동 계산)",
+    "수축기 혈압을 입력해주세요",
+    "이완기 혈압을 입력해주세요",
+    "공복 혈당을 입력해주세요",
+    "흡연하시나요?",
+    "음주하시나요? (주 1회 기준)"
+];
+
+let step = 1;
+const data = { gender:1, smoking:0, drinking:0 };
+
+document.querySelectorAll(".btn-opt").forEach(b=>{
+    b.onclick = ()=> {
+        b.parentNode.querySelectorAll(".btn-opt").forEach(x=>x.classList.remove("active"));
+        b.classList.add("active");
+    }
+});
+
+document.getElementById("next").onclick = ()=>{
+
+    if(step===1) data.gender = document.querySelector("#step1 .active").dataset.value;
+    if(step===7) data.smoking = document.querySelector("#step7 .active").dataset.value;
+    if(step===8) data.drinking = document.querySelector("#step8 .active").dataset.value;
+
+    if(step===2){
+        let age = document.getElementById("age").value;
+        if(!age){alert("만 나이를 입력해주세요");return;}
+        data.age = parseFloat(age);
+    }
+
+    if(step===3){
+        let h = document.getElementById("height").value;
+        let w = document.getElementById("weight").value;
+        if(!h || !w){ alert("키와 몸무게를 모두 입력해주세요"); return; }
+        data.bmi = (w / ((h/100)**2)).toFixed(1);
+    }
+
+    if(step===4){
+        let v = document.getElementById("sbp").value;
+        if(!v){alert("수축기 혈압을 입력해주세요");return;}
+        data.sbp = parseFloat(v);
+    }
+
+    if(step===5){
+        let v = document.getElementById("dbp").value;
+        if(!v){alert("이완기 혈압을 입력해주세요");return;}
+        data.dbp = parseFloat(v);
+    }
+
+    if(step===6){
+        let v = document.getElementById("glucose").value;
+        if(!v){alert("공복 혈당을 입력해주세요");return;}
+        data.glucose = parseFloat(v);
+    }
+
+    if(step < 8){
+        document.getElementById("step"+step).classList.add("d-none");
+        step++;
+        document.getElementById("step"+step).classList.remove("d-none");
+
+        document.getElementById("question").innerText = step+"/8 "+questions[step-1];
+        document.getElementById("prog").style.width = (step/8)*100 + "%";
+        document.getElementById("prev").classList.remove("d-none");
+
+        if(step===8){
+            document.getElementById("next").classList.add("d-none");
+            document.getElementById("submit").classList.remove("d-none");
         }
+    }
+};
 
-        function predict() {
-            const payload = {
-                gender: document.getElementById("gender").value,
-                age: document.getElementById("age").value,
-                bmi: document.getElementById("bmi").value,
-                sbp: document.getElementById("sbp").value,
-                dbp: document.getElementById("dbp").value,
-                glucose: document.getElementById("glucose").value,
-                smoking: document.getElementById("smoking").value,
-                drinking: document.getElementById("drinking").value
-            };
+document.getElementById("prev").onclick = ()=>{
+    document.getElementById("step"+step).classList.add("d-none");
+    step--;
+    document.getElementById("step"+step).classList.remove("d-none");
 
-            fetch("/predict", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(payload)
-            })
-                .then(res => res.json())
-                .then(data => {
-                    const box = document.getElementById("result-box");
-                    box.style.display = "block";
+    document.getElementById("question").innerText = step+"/8 "+questions[step-1];
+    document.getElementById("prog").style.width = (step/8)*100 + "%";
 
-                    document.getElementById("risk-title").innerText =
-                        `결과: ${data.risk_text}`;
-                    document.getElementById("prob-text").innerText =
-                        `예측 확률: ${data.prob}%`;
-                    document.getElementById("advice").innerText =
-                        data.advice;
+    if(step===1) document.getElementById("prev").classList.add("d-none");
+    document.getElementById("submit").classList.add("d-none");
+    document.getElementById("next").classList.remove("d-none");
+};
 
-                    box.className = "result-box " + data.risk_class;
+document.getElementById("submit").onclick = ()=>{
 
-                    document.getElementById(`page${current}`).classList.remove("active");
-                });
-        }
-    </script>
+    document.getElementById("survey").classList.add("d-none");
+    document.getElementById("result").classList.remove("d-none");
+
+    document.getElementById("resultCard").innerHTML = `
+        <h2>AI가 분석 중입니다...</h2>
+        <div class="spinner-border text-light" style="width:4rem;height:4rem"></div>
+        <p class="mt-4 fs-4">잠시만 기다려주세요</p>
+    `;
+
+    fetch("/predict", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify(data)
+    })
+    .then(r=>r.json())
+    .then(res=>{
+        const card = document.getElementById("resultCard");
+
+        card.classList.remove("result-high","result-low");
+        card.classList.add(res.risk_class);
+
+        card.innerHTML = `
+            <h1 class="display-1 fw-bold mb-3">${res.prob}%</h1>
+            <h2 class="display-5 mb-4">${res.risk_text}군</h2>
+
+            <div class="result-text-box">${res.advice}</div>
+
+            <p class="mt-4" style="font-size:1rem;opacity:0.85;">
+                조언 생성 모델: <strong>Groq LLaMA-3.1-8B-Instant</strong>
+            </p>
+
+            <button class="btn btn-light btn-lg mt-5 px-5" onclick="location.reload()">다시 검사하기</button>
+        `;
+    })
+    .catch(()=>{
+        document.getElementById("resultCard").innerHTML = `
+            <h2>서버 오류 발생</h2>
+            <button class="btn btn-light mt-4" onclick="location.reload()">다시 시도</button>
+        `;
+    });
+};
+</script>
 
 </body>
-
 </html>
