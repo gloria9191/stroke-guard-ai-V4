@@ -9,7 +9,7 @@
     <style>
         body {
             font-family: 'Pretendard', sans-serif;
-            background: #f5f6fa;
+            background: #eef3f9;
             margin: 0;
             padding: 0;
         }
@@ -19,176 +19,218 @@
             margin: auto;
             padding: 25px;
             background: white;
-            margin-top: 10px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            margin-top: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         h2 {
             text-align: center;
-            font-size: 23px;
-            font-weight: 700;
-            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: #1a3d8f;
+        }
+
+        .progress-bar-box {
+            width: 100%;
+            height: 8px;
+            background: #e4e8ef;
+            border-radius: 20px;
+            margin-top: 25px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: #4c7dff;
+            border-radius: 20px;
+            transition: 0.3s;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
         }
 
         .input-box {
-            margin-bottom: 15px;
+            margin-top: 25px;
         }
 
-        .input-box label {
+        label {
+            font-size: 15px;
             font-weight: 600;
-            font-size: 14px;
         }
 
-        .input-box input,
-        .input-box select {
+        input, select {
             width: 100%;
-            padding: 10px;
-            margin-top: 6px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #bfc7d8;
+            margin-top: 8px;
             font-size: 15px;
         }
 
         .btn {
             width: 100%;
-            background: #0050ff;
+            background: #3368ff;
             color: white;
-            padding: 13px;
+            padding: 14px;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             cursor: pointer;
             font-size: 17px;
+            margin-top: 25px;
             font-weight: 700;
-            margin-top: 10px;
         }
 
         .btn:hover {
-            background: #003ed6;
+            background: #1e4ed9;
+        }
+
+        .risk-guide {
+            background: #f5f7ff;
+            padding: 15px;
+            border-radius: 12px;
+            border-left: 6px solid #4c6fff;
+            margin-top: 20px;
         }
 
         .result-box {
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 12px;
+            margin-top: 30px;
+            padding: 22px;
+            border-radius: 14px;
             display: none;
         }
 
         .result-low {
-            background: #e7f3ff;
-            border-left: 6px solid #1e90ff;
+            background: #e8f2ff;
+            border-left: 7px solid #1e6cff;
         }
 
         .result-high {
-            background: #ffe8e8;
-            border-left: 6px solid #ff3b3b;
+            background: #ffe5e5;
+            border-left: 7px solid #ff3b3b;
         }
 
         .advice-text {
             margin-top: 15px;
             font-size: 15px;
-            line-height: 1.45;
+            line-height: 1.5;
             white-space: pre-line;
         }
 
-        /* 스크롤 힌트 */
         .scroll-hint {
             text-align: center;
-            color: #666;
             margin-top: 10px;
-            margin-bottom: -5px;
+            color: #7b879a;
             font-size: 13px;
         }
-
-        /* 위험군 기준 안내 */
-        .risk-guide {
-            background: #f8f9fa;
-            padding: 13px;
-            border-radius: 10px;
-            border-left: 5px solid #3566ff;
-            margin-top: 15px;
-            margin-bottom: 22px;
-        }
-
-        .risk-guide p {
-            margin: 0;
-            font-size: 14px;
-        }
     </style>
-
 </head>
 
 <body>
 
     <div class="container">
-        <h2>StrokeGuard AI<br>뇌졸중 위험 예측</h2>
+        <h2>StrokeGuard AI</h2>
+        <div class="scroll-hint">⬇ 아래로 스크롤하여 설문을 진행하세요</div>
 
-        <div class="scroll-hint">⬇ 아래로 스크롤하여 입력 후 결과를 확인하세요 ⬇</div>
-
-        <!-- 위험군 기준 명시 -->
         <div class="risk-guide">
-            <p>
-                📌 <b>모델 기반 위험군 분류 기준</b><br><br>
-                ● <b>고위험</b>: 예측 확률 ≥ <b>66%</b><br>
-                ● <b>저위험</b>: 예측 확률 < <b>66%</b><br><br>
-                ※ 이 기준은 LightGBM 모델 검증에서 민감도(Recall)를 최대 확보한
-                최적 Threshold = <b>0.66</b> 분석값을 근거로 합니다.
-            </p>
+            <b>📌 모델 기반 위험군 분류 기준</b><br><br>
+            ● <b>고위험</b>: 예측 확률 ≥ 66%<br>
+            ● <b>저위험</b>: 예측 확률 < 66%<br><br>
+            ※ Threshold = <b>0.66</b> (LightGBM 최적 민감도 기준)
         </div>
 
-        <!-- 입력폼 -->
-        <div class="input-box">
-            <label>성별</label>
-            <select id="gender">
-                <option value="1">남성</option>
-                <option value="0">여성</option>
-            </select>
+        <div class="progress-bar-box">
+            <div class="progress-bar" id="progress"></div>
         </div>
 
-        <div class="input-box">
-            <label>만 나이</label>
-            <input type="number" id="age" placeholder="예: 45" />
+        <!-- 페이지 1 -->
+        <div class="page active" id="page1">
+            <div class="input-box">
+                <label>성별</label>
+                <select id="gender">
+                    <option value="1">남성</option>
+                    <option value="0">여성</option>
+                </select>
+            </div>
+            <button class="btn" onclick="nextPage()">다음</button>
         </div>
 
-        <div class="input-box">
-            <label>BMI</label>
-            <input type="number" id="bmi" step="0.1" placeholder="예: 24.6" />
+        <!-- 페이지 2 -->
+        <div class="page" id="page2">
+            <div class="input-box">
+                <label>만 나이</label>
+                <input id="age" type="number" placeholder="예: 45">
+            </div>
+            <button class="btn" onclick="nextPage()">다음</button>
         </div>
 
-        <div class="input-box">
-            <label>수축기 혈압 (mmHg)</label>
-            <input type="number" id="sbp" placeholder="예: 135" />
+        <!-- 페이지 3 -->
+        <div class="page" id="page3">
+            <div class="input-box">
+                <label>BMI</label>
+                <input id="bmi" type="number" step="0.1" placeholder="예: 24.5">
+            </div>
+            <button class="btn" onclick="nextPage()">다음</button>
         </div>
 
-        <div class="input-box">
-            <label>이완기 혈압 (mmHg)</label>
-            <input type="number" id="dbp" placeholder="예: 85" />
+        <!-- 페이지 4 -->
+        <div class="page" id="page4">
+            <div class="input-box">
+                <label>수축기 혈압</label>
+                <input id="sbp" type="number" placeholder="예: 130">
+            </div>
+            <button class="btn" onclick="nextPage()">다음</button>
         </div>
 
-        <div class="input-box">
-            <label>공복 혈당 (mg/dL)</label>
-            <input type="number" id="glucose" placeholder="예: 110" />
+        <!-- 페이지 5 -->
+        <div class="page" id="page5">
+            <div class="input-box">
+                <label>이완기 혈압</label>
+                <input id="dbp" type="number" placeholder="예: 85">
+            </div>
+            <button class="btn" onclick="nextPage()">다음</button>
         </div>
 
-        <div class="input-box">
-            <label>흡연 여부</label>
-            <select id="smoking">
-                <option value="0">비흡연</option>
-                <option value="1">흡연</option>
-            </select>
+        <!-- 페이지 6 -->
+        <div class="page" id="page6">
+            <div class="input-box">
+                <label>공복 혈당</label>
+                <input id="glucose" type="number" placeholder="예: 110">
+            </div>
+            <button class="btn" onclick="nextPage()">다음</button>
         </div>
 
-        <div class="input-box">
-            <label>음주 여부 (주 1회 이상 기준)</label>
-            <select id="drinking">
-                <option value="0">주 1회 미만</option>
-                <option value="1">주 1회 이상</option>
-            </select>
+        <!-- 페이지 7 -->
+        <div class="page" id="page7">
+            <div class="input-box">
+                <label>흡연 여부</label>
+                <select id="smoking">
+                    <option value="0">비흡연</option>
+                    <option value="1">흡연</option>
+                </select>
+            </div>
+            <button class="btn" onclick="nextPage()">다음</button>
         </div>
 
-        <button class="btn" onclick="predict()">예측하기</button>
+        <!-- 페이지 8 -->
+        <div class="page" id="page8">
+            <div class="input-box">
+                <label>음주 여부 (주 1회 이상 기준)</label>
+                <select id="drinking">
+                    <option value="0">주 1회 미만</option>
+                    <option value="1">주 1회 이상</option>
+                </select>
+            </div>
+            <button class="btn" onclick="predict()">예측하기</button>
+        </div>
 
-        <!-- 결과 박스 -->
+        <!-- 결과 페이지 -->
         <div id="result-box" class="result-box">
             <h3 id="risk-title"></h3>
             <p id="prob-text"></p>
@@ -198,6 +240,16 @@
     </div>
 
     <script>
+        let current = 1;
+
+        function nextPage() {
+            document.getElementById(`page${current}`).classList.remove("active");
+            current++;
+            document.getElementById(`page${current}`).classList.add("active");
+
+            document.getElementById("progress").style.width = (current - 1) * 12.5 + "%";
+        }
+
         function predict() {
             const payload = {
                 gender: document.getElementById("gender").value,
@@ -212,7 +264,7 @@
 
             fetch("/predict", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(payload)
             })
                 .then(res => res.json())
@@ -220,11 +272,16 @@
                     const box = document.getElementById("result-box");
                     box.style.display = "block";
 
-                    document.getElementById("risk-title").innerText = `결과: ${data.risk_text}`;
-                    document.getElementById("prob-text").innerText = `예측 확률: ${data.prob}%`;
-                    document.getElementById("advice").innerText = data.advice;
+                    document.getElementById("risk-title").innerText =
+                        `결과: ${data.risk_text}`;
+                    document.getElementById("prob-text").innerText =
+                        `예측 확률: ${data.prob}%`;
+                    document.getElementById("advice").innerText =
+                        data.advice;
 
                     box.className = "result-box " + data.risk_class;
+
+                    document.getElementById(`page${current}`).classList.remove("active");
                 });
         }
     </script>
