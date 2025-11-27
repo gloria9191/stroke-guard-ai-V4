@@ -29,16 +29,8 @@ def generate_advice(prob):
 
     prompt = f"""
     사용자의 뇌졸중 발병 확률은 {prob}% 입니다.
-
-    한국 성인 기준으로 다음 항목 중심으로
-    - 식습관
-    - 운동
-    - 혈압/혈당 관리
-    - 위험 신호 체크
-    - 금연·절주
-
-    5줄 이내 자연스러운 한국어 문장으로만 작성하세요.
-    외국어나 이모지, 특수문자 금지.
+    한국 성인 기준 맞춤 건강 조언을 5줄 이내 한국어로 작성하세요.
+    외국어, 이모지, 특수문자 금지.
     """
 
     try:
@@ -46,31 +38,33 @@ def generate_advice(prob):
             "https://api.groq.com/openai/v1/chat/completions",
             headers={
                 "Content-Type": "application/json",
-                "Authorization": f"Bearer {GROQ_API_KEY}",
+                "Authorization": f"Bearer {GROQ_API_KEY}"
             },
             json={
                 "model": "llama-3.1-8b-instant",
                 "messages": [{"role": "user", "content": prompt}],
-                "temperature": 0.6,
+                "temperature": 0.6
             },
-            timeout=15
+            timeout=12
         )
 
         ans = r.json()
 
-        # 🚨 여기가 핵심: 응답 구조가 없을 수 있음 → 체크해야 함
-        if "choices" not in ans or len(ans["choices"]) == 0:
-            return "AI 조언 생성이 완료되지 않았습니다."
+        # 1) 정상 구조
+        if "choices" in ans:
+            msg = ans["choices"][0].get("message", {})
+            content = msg.get("content")
+            if content: 
+                return content.strip()
 
-        msg = ans["choices"][0].get("message", {}).get("content", "")
+        # 2) Stream 형태 fallback
+        if "content" in ans:
+            return ans["content"].strip()
 
-        if not msg:
-            return "AI 조언 생성이 완료되지 않았습니다."
+        # 3) 실패
+        return "AI 조언 생성 중 오류가 발생했습니다."
 
-        return msg.strip()
-
-    except Exception as e:
-        print("LLM ERROR :", e)
+    except Exception:
         return "AI 조언 생성 중 오류가 발생했습니다."
 
 
