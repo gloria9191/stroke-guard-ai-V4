@@ -12,7 +12,6 @@ app = Flask(__name__)
 print("🔄 Loading stroke_model.pkl ...")
 raw = joblib.load("stroke_model.pkl")
 
-# dict 형태라면 모델만 꺼내기
 if isinstance(raw, dict) and "model" in raw:
     model = raw["model"]
 else:
@@ -22,12 +21,13 @@ print("📌 Loaded object type:", type(raw))
 print("📌 Final model type:", type(model))
 print("📌 Keys:", raw.keys() if isinstance(raw, dict) else "none")
 
-print("✅ 모델 로드 완료")
+print("🔄 Loading scaler.pkl / kmeans.pkl ...")
+scaler = joblib.load("scaler.pkl")
+kmeans = joblib.load("kmeans.pkl")
+print("✔ scaler / kmeans 로드 완료")
 
-
-# 🔥 너 모델의 실제 최적 threshold = 0.66
-THRESHOLD = 0.66
-
+# 학습된 LightGBM 최적 threshold
+THRESHOLD = 0.0297
 
 # ------------------------------------------------
 # 2) GROQ API 설정
@@ -35,6 +35,10 @@ THRESHOLD = 0.66
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 print("🔑 Loaded GROQ_API_KEY:", GROQ_API_KEY)
 
+
+# ------------------------------------------------
+# 3) LLM 조언 생성 함수
+# ------------------------------------------------
 def generate_advice(prob, user_info):
     if not GROQ_API_KEY:
         print("❌ GROQ_API_KEY 없음")
@@ -47,13 +51,13 @@ def generate_advice(prob, user_info):
     - 성별: {"남성" if user_info['gender']==1 else "여성"}
     - 나이: {user_info['age']}세
     - BMI: {user_info['bmi']}
-    - 수축기 혈압(sbp): {user_info['sbp']}
-    - 이완기 혈압(dbp): {user_info['dbp']}
-    - 공복 혈당(glucose): {user_info['glucose']} mg/dL
+    - 수축기 혈압: {user_info['sbp']}
+    - 이완기 혈압: {user_info['dbp']}
+    - 공복 혈당: {user_info['glucose']} mg/dL
     - 흡연 여부: {"흡연" if user_info['smoking']==1 else "비흡연"}
     - 음주 여부: {"음주" if user_info['drinking']==1 else "비음주"}
 
-    위 정보를 종합해 5줄 이내의 한국어 건강 조언을 작성하세요.
+    위 정보를 바탕으로 맞춤형 건강 관리 조언을 5줄 이내 한국어로 작성해 주세요.
     """
 
     try:
@@ -72,15 +76,9 @@ def generate_advice(prob, user_info):
         )
 
         ans = r.json()
-        print("🔥 RAW LLM 응답:", ans)      # ← 디버깅 핵심
+        print("🔥 RAW LLM 응답:", ans)
 
-        # 클린하게 에러 로그 처리
-        if "error" in ans:
-            print("❌ API 오류:", ans["error"])
-            return "AI 조언 생성 중 오류가 발생했습니다."
-
-        if "choices" not in ans or len(ans["choices"]) == 0:
-            print("❌ choices 없음")
+        if "choices" not in ans:
             return "AI 조언 생성 중 오류가 발생했습니다."
 
         return ans["choices"][0]["message"]["content"].strip()
@@ -90,9 +88,8 @@ def generate_advice(prob, user_info):
         return "AI 조언 생성 중 오류가 발생했습니다."
 
 
-
 # ------------------------------------------------
-# 3) 라우팅
+# 4) Routing
 # ------------------------------------------------
 @app.route("/", methods=["GET"])
 def index():
@@ -113,19 +110,31 @@ def predict():
         smoking   = float(data["smoking"])
         drinking  = float(data["drinking"])
 
-        X = np.array([[gender, age, bmi, sbp, dbp, glucose, smoking, drinking]])
+        # ---- 추가 3개 Feature 계산 ----
+        hypertension = 1 if sbp >= 140 else 0
+        diabetes = 1 if glucose >= 126 else 0
+        exercise = 0  # NHANES 모델과 동일하게 고정
+
+        # ---- cluster 계산 ----
+        arr12 = np.array([[age, gender, bmi, sbp, dbp, glucose,
+                           smoking, drinking, hypertension, diabetes, exercise]])
+
+        scaled = scaler.transform(arr12)
+        cluster_value = int(kmeans.predict(scaled)[0])
+
+        # ---- 최종 12 features + cluster = 13개 ----
+        X = np.array([[gender, age, bmi, sbp, dbp, glucose,
+                       smoking, drinking, hypertension, diabetes, exercise,
+                       cluster_value]])
+
         proba = model.predict_proba(X)[0][1]
         prob_percent = round(proba * 100, 1)
 
-        # 🔥 모델 기준 위험군 정의 (Threshold = 0.66)
-        if proba >= THRESHOLD:
-            risk_text  = "고위험"
-            risk_class = "result-high"
-        else:
-            risk_text  = "저위험"
-            risk_class = "result-low"
+        # ---- 위험군 분류 ----
+        risk_text  = "고위험" if proba >= THRESHOLD else "저위험"
+        risk_class = "result-high" if proba >= THRESHOLD else "result-low"
 
-        # 사용자 정보 텍스트로 전달하여 맞춤형 조언 강화
+        # ---- LLM 조언 ----
         user_info = {
             "gender": gender,
             "age": age,
@@ -147,12 +156,9 @@ def predict():
         })
 
     except Exception as e:
-        print("❌ LLM 요청 실패:", e)
+        print("❌ 예측 오류:", e)
         return jsonify({"error": f"서버 오류: {str(e)}"})
 
 
-# ------------------------------------------------
-# Render: run() 없음
-# ------------------------------------------------
 if __name__ == "__main__":
     pass
