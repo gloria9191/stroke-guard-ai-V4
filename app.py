@@ -23,30 +23,22 @@ THRESHOLD = 0.66
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 print("🔑 Loaded GROQ_API_KEY:", GROQ_API_KEY)
 
-def generate_advice(prob, user_info):
+def generate_advice(prob):
     if not GROQ_API_KEY:
         return "AI 조언 생성이 활성화되지 않았습니다."
 
-    # 사용자 특성 반영 조언
     prompt = f"""
-    아래 사용자의 건강 정보를 바탕으로 한국인 기준 뇌졸중 예방 조언을 6줄 이내 한국어 문장으로 작성하세요.
-    절대 외국어와 이모지 금지.
+    사용자의 뇌졸중 발병 확률은 {prob}% 입니다.
 
-    [사용자 정보]
-    - 성별: {user_info['gender']}
-    - 만나이: {user_info['age']}세
-    - BMI: {user_info['bmi']}
-    - 수축기혈압: {user_info['sbp']}
-    - 이완기혈압: {user_info['dbp']}
-    - 공복혈당: {user_info['glucose']}
-    - 흡연 여부: {user_info['smoking']}
-    - 음주(주 1회 이상): {user_info['drinking']}
-    - 예측된 뇌졸중 위험도: {prob}%
+    한국 성인 기준으로 다음 항목 중심으로
+    - 식습관
+    - 운동
+    - 혈압/혈당 관리
+    - 위험 신호 체크
+    - 금연·절주
 
-    [조언 조건]
-    - 혈압 관리, 혈당 조절, 금연/절주, 운동, 위험 신호 체크 중심
-    - 사용자 수치에 따라 맞춤형 조언 포함
-    - 의료적 맥락 유지
+    5줄 이내 자연스러운 한국어 문장으로만 작성하세요.
+    외국어나 이모지, 특수문자 금지.
     """
 
     try:
@@ -54,22 +46,31 @@ def generate_advice(prob, user_info):
             "https://api.groq.com/openai/v1/chat/completions",
             headers={
                 "Content-Type": "application/json",
-                "Authorization": f"Bearer {GROQ_API_KEY}"
+                "Authorization": f"Bearer {GROQ_API_KEY}",
             },
             json={
                 "model": "llama-3.1-8b-instant",
                 "messages": [{"role": "user", "content": prompt}],
-                "temperature": 0.6
+                "temperature": 0.6,
             },
             timeout=15
         )
+
         ans = r.json()
-        if "choices" in ans and len(ans["choices"]) > 0:
-            return ans["choices"][0]["message"]["content"].strip()
-            
-        return ans["choices"][0]["message"]["content"].strip()
-    except Exception:
-        print("LLM ERROR:", e)
+
+        # 🚨 여기가 핵심: 응답 구조가 없을 수 있음 → 체크해야 함
+        if "choices" not in ans or len(ans["choices"]) == 0:
+            return "AI 조언 생성이 완료되지 않았습니다."
+
+        msg = ans["choices"][0].get("message", {}).get("content", "")
+
+        if not msg:
+            return "AI 조언 생성이 완료되지 않았습니다."
+
+        return msg.strip()
+
+    except Exception as e:
+        print("LLM ERROR :", e)
         return "AI 조언 생성 중 오류가 발생했습니다."
 
 
