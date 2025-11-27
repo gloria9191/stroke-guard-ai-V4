@@ -25,17 +25,26 @@ print("🔑 Loaded GROQ_API_KEY:", GROQ_API_KEY)
 
 def generate_advice(prob):
     if not GROQ_API_KEY:
+        print("❌ GROQ_API_KEY 없음")
         return "AI 조언 생성이 활성화되지 않았습니다."
 
     prompt = f"""
     사용자의 뇌졸중 발병 확률은 {prob}% 입니다.
-    한국 성인 기준 맞춤 건강 조언을 5줄 이내 한국어로 작성하세요.
-    외국어, 이모지, 특수문자 금지.
+
+    한국 성인 기준으로,
+    - 식습관
+    - 운동 습관
+    - 혈압 및 혈당 관리
+    - 주의해야 할 위험 신호
+    - 금연/절주
+
+    위 항목을 바탕으로 5줄 이내 한국어 문장만 작성하세요.
+    외국어·이모지 금지.
     """
 
     try:
         r = requests.post(
-            "https://api.groq.com/v1/chat/completions",
+            "https://api.groq.com/v1/chat/completions",  # ← 최신 공식 엔드포인트
             headers={
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {GROQ_API_KEY}"
@@ -45,27 +54,23 @@ def generate_advice(prob):
                 "messages": [{"role": "user", "content": prompt}],
                 "temperature": 0.6
             },
-            timeout=12
+            timeout=30   # ← Render 시간 늘림
         )
 
         ans = r.json()
 
-        # 1) 정상 구조
-        if "choices" in ans:
-            msg = ans["choices"][0].get("message", {})
-            content = msg.get("content")
-            if content: 
-                return content.strip()
+        print("🔥 GROQ 응답:", ans)   # ← Render 로그에 찍힘
 
-        # 2) Stream 형태 fallback
-        if "content" in ans:
-            return ans["content"].strip()
+        # 응답 구조 검증
+        if "choices" not in ans:
+            return "AI 조언 생성 중 오류가 발생했습니다."
 
-        # 3) 실패
+        return ans["choices"][0]["message"]["content"].strip()
+
+    except Exception as e:
+        print("❌ LLM 요청 실패:", e)
         return "AI 조언 생성 중 오류가 발생했습니다."
 
-    except Exception:
-        return "AI 조언 생성 중 오류가 발생했습니다."
 
 
 # ------------------------------------------------
