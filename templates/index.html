@@ -295,6 +295,10 @@ document.getElementById("submit").onclick = () => {
         });
 };
 </script>
+// 기본 선택값 자동 활성화 (undefined 방지)
+document.querySelector("#step1 .btn-opt")?.classList.add("active");
+document.querySelector("#step7 .btn-opt")?.classList.add("active");
+document.querySelector("#step8 .btn-opt")?.classList.add("active");
 
 </body>
 </html>
