@@ -67,7 +67,11 @@
         </div>
 
         <p class="tagline"><span class="icon">SYNAPSE</span>작은 변화가 큰 미래를 만듭니다</p>
-        <div class="animated-hint">⬇ 아래로 스크롤하여 설문을 시작하세요</div>
+
+        <div class="scroll-hint animated-hint" style="margin-top: 40px;">
+            ⬇ 아래로 스크롤하여 설문을 시작하세요
+        </div>
+    
     </div>
 </div>
 
@@ -178,10 +182,16 @@ const questions = [
 let step = 1;
 const data = {};
 
+// ⭐ 기본 active 미리 고정(특히 step7, step8 undefined 방지)
+data.gender   = 1;
+data.smoking  = 0;
+data.drinking = 0;
+
 document.getElementById("next").onclick = () => {
 
-    if (step === 1)
+    if (step === 1) {
         data.gender = Number(document.querySelector("#step1 .active").dataset.value);
+    }
 
     if (step === 2) {
         let v = document.getElementById("age").value;
@@ -214,13 +224,13 @@ document.getElementById("next").onclick = () => {
         data.glucose = Number(v);
     }
 
-    if (step === 7)
+    if (step === 7) {
         data.smoking = Number(document.querySelector("#step7 .active").dataset.value);
+    }
 
-    if (step === 8)
+    if (step === 8) {
         data.drinking = Number(document.querySelector("#step8 .active").dataset.value);
-
-
+    }
 
     // 페이지 이동
     if (step < 8) {
@@ -249,29 +259,28 @@ document.getElementById("prev").onclick = () => {
     document.getElementById("prog").style.width = `${(step / 8) * 100}%`;
 
     if (step === 1) document.getElementById("prev").classList.add("d-none");
+
     document.getElementById("submit").classList.add("d-none");
     document.getElementById("next").classList.remove("d-none");
 };
 
+
 document.getElementById("submit").onclick = () => {
-    
-    // undefined 방지 검증
-    
-    // undefined 값 방지용 체크
+
+    // ⭐ 최종 안전 검증
     if (
-        data.gender === undefined ||
-        data.age === undefined ||
-        data.bmi === undefined ||
-        data.sbp === undefined ||
-        data.dbp === undefined ||
-        data.glucose === undefined ||
-        data.smoking === undefined ||
+        data.gender   === undefined ||
+        data.age      === undefined ||
+        data.bmi      === undefined ||
+        data.sbp      === undefined ||
+        data.dbp      === undefined ||
+        data.glucose  === undefined ||
+        data.smoking  === undefined ||
         data.drinking === undefined
     ) {
         alert("입력되지 않은 항목이 있습니다.");
         return;
     }
-
 
     document.getElementById("survey").classList.add("d-none");
     document.getElementById("result").classList.remove("d-none");
@@ -286,26 +295,27 @@ document.getElementById("submit").onclick = () => {
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify(data)
     })
-        .then(r => r.json())
-        .then(res => {
-            const card = document.getElementById("resultCard");
-            card.classList.remove("result-high","result-low");
-            card.classList.add(res.risk_class);
+    .then(r => r.json())
+    .then(res => {
+        const card = document.getElementById("resultCard");
+        card.classList.remove("result-high","result-low");
+        card.classList.add(res.risk_class);
 
-            card.innerHTML = `
-                <h1 class="display-1 fw-bold mb-3">${res.prob}%</h1>
-                <h2 class="display-5 mb-4">${res.risk_text}군</h2>
-                <div class="result-text-box">${res.advice}</div>
-                <button class="btn btn-light btn-lg mt-5 px-5" onclick="location.reload()">다시 검사하기</button>
-            `;
-        })
-        .catch(()=>{
-            document.getElementById("resultCard").innerHTML = `
-                <h2>서버 오류 발생</h2>
-                <button class="btn btn-light mt-4" onclick="location.reload()">다시 시도</button>
-            `;
-        });
+        card.innerHTML = `
+            <h1 class="display-1 fw-bold mb-3">${res.prob}%</h1>
+            <h2 class="display-5 mb-4">${res.risk_text}군</h2>
+            <div class="result-text-box">${res.advice}</div>
+            <button class="btn btn-light btn-lg mt-5 px-5" onclick="location.reload()">다시 검사하기</button>
+        `;
+    })
+    .catch(()=>{
+        document.getElementById("resultCard").innerHTML = `
+            <h2>서버 오류 발생</h2>
+            <button class="btn btn-light mt-4" onclick="location.reload()">다시 시도</button>
+        `;
+    });
 };
+
 </script>
 
 </body>
