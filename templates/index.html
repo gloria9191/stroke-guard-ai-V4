@@ -66,11 +66,12 @@
             <span class="badge">실시간 AI 건강 코칭</span>
         </div>
 
-        <p class="tagline"><span class="icon">SYNAPSE</span>작은 변화가 큰 미래를 만듭니다</p>
-
-        <div class="scroll-hint animated-hint" style="bottom: 20px; margin-top: 0;">
+        <div class="scroll-hint animated-hint" style="bottom: 20px;">
             ⬇ 아래로 스크롤하여 설문을 시작하세요
         </div>
+
+        <p class="tagline"><span class="icon">SYNAPSE</span>작은 변화가 큰 미래를 만듭니다</p>
+
 
     
     </div>
@@ -298,6 +299,12 @@ document.getElementById("submit").onclick = () => {
     })
     .then(r => r.json())
     .then(res => {
+        // undefined 방지
+        if (!res.prob) res.prob = 0;
+        if (!res.risk_text) res.risk_text = "저위험";
+        if (!res.risk_class) res.risk_class = "result-low";
+        if (!res.advice) res.advice = "AI 조언을 불러오지 못했습니다.";
+
         const card = document.getElementById("resultCard");
         card.classList.remove("result-high","result-low");
         card.classList.add(res.risk_class);
