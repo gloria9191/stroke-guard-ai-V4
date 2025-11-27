@@ -44,49 +44,46 @@ def generate_advice(prob, user_info):
         print("❌ GROQ_API_KEY 없음")
         return "AI 조언 생성이 활성화되지 않았습니다."
 
+    url = "https://api.groq.com/openai/v1/chat/completions"
+
     prompt = f"""
-    사용자의 뇌졸중 발병 확률은 {prob}% 입니다.
+    사용자의 뇌졸중 발병 확률은 {prob}%입니다.
 
-    아래는 사용자의 건강 정보입니다:
-    - 성별: {"남성" if user_info['gender']==1 else "여성"}
-    - 나이: {user_info['age']}세
-    - BMI: {user_info['bmi']}
-    - 수축기 혈압: {user_info['sbp']}
-    - 이완기 혈압: {user_info['dbp']}
-    - 공복 혈당: {user_info['glucose']} mg/dL
-    - 흡연 여부: {"흡연" if user_info['smoking']==1 else "비흡연"}
-    - 음주 여부: {"음주" if user_info['drinking']==1 else "비음주"}
+    성별: {'남성' if user_info['gender']==1 else '여성'}
+    나이: {user_info['age']}세
+    BMI: {user_info['bmi']}
+    수축기 혈압: {user_info['sbp']}
+    이완기 혈압: {user_info['dbp']}
+    공복혈당: {user_info['glucose']}
+    흡연 여부: {'예' if user_info['smoking']==1 else '아니오'}
+    음주 여부: {'예' if user_info['drinking']==1 else '아니오'}
 
-    위 정보를 바탕으로 맞춤형 건강 관리 조언을 5줄 이내 한국어로 작성해 주세요.
+    위 정보를 반영해 한국 성인 기준 5줄 이내로 조언을 작성하세요.
     """
 
     try:
         r = requests.post(
-            "https://api.groq.com/openai/v1/chat/completions",
+            url,
             headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {GROQ_API_KEY}"
+                "Authorization": f"Bearer {GROQ_API_KEY}",
+                "Content-Type": "application/json"
             },
             json={
-                "model": "llama-3.1-8b-instant",
+                "model": "mixtral-8x7b-32768",
                 "messages": [{"role": "user", "content": prompt}],
                 "temperature": 0.6
             },
-            timeout=30
+            timeout=20
         )
 
         ans = r.json()
         print("🔥 RAW LLM 응답:", ans)
-
-        if "choices" not in ans:
-            return "AI 조언 생성 중 오류가 발생했습니다."
 
         return ans["choices"][0]["message"]["content"].strip()
 
     except Exception as e:
         print("❌ LLM 요청 실패:", e)
         return "AI 조언 생성 중 오류가 발생했습니다."
-
 
 # ------------------------------------------------
 # 4) Routing
