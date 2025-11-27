@@ -21,6 +21,7 @@ THRESHOLD = 0.66
 # 2) GROQ API 설정
 # ------------------------------------------------
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+print("🔑 Loaded GROQ_API_KEY:", GROQ_API_KEY)
 
 def generate_advice(prob, user_info):
     if not GROQ_API_KEY:
