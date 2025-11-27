@@ -27,16 +27,7 @@ def generate_advice(prob, user_info):
     if not GROQ_API_KEY:
         print("❌ GROQ_API_KEY 없음")
         return "AI 조언 생성이 활성화되지 않았습니다."
-    user_text = f"""
-    성별: { '남성' if user_info['gender']==1 else '여성' }
-    나이: {user_info['age']}세
-    BMI: {user_info['bmi']}
-    수축기 혈압: {user_info['sbp']}
-    이완기 혈압: {user_info['dbp']}
-    공복 혈당: {user_info['glucose']}
-    흡연 여부: {'예' if user_info['smoking']==1 else '아니오'}
-    음주 여부: {'예' if user_info['drinking']==1 else '아니오'}
-    """
+
     prompt = f"""
     사용자의 뇌졸중 발병 확률은 {prob}% 입니다.
 
@@ -50,18 +41,13 @@ def generate_advice(prob, user_info):
     - 흡연 여부: {"흡연" if user_info['smoking']==1 else "비흡연"}
     - 음주 여부: {"음주" if user_info['drinking']==1 else "비음주"}
 
-    위 정보를 종합해,
-    한국 성인 기준 건강관리 조언을 5줄 이내 한국어 문장만으로 작성하세요.
-
-    반드시 다음 원칙을 지킬 것:
-    - 외국어, 이모지, 특수문자 금지
-    - 너무 원론적인 말 금지
-    - 입력된 수치(BMI, 혈압, 혈당)에 근거한 개인 맞춤형 조언 포함
+    위 정보를 종합해 한국 성인 기준 5줄 이내 한국어 조언을 작성하세요.
+    외국어·이모지 금지. 입력된 수치를 근거로 개인화된 조언을 포함하세요.
     """
 
     try:
-        r = requests.post(
-            "https://api.groq.com/v1/chat/completions",
+        response = requests.post(
+            "https://api.groq.com/v1/chat/completions",   # ← 엔드포인트 확정
             headers={
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {GROQ_API_KEY}"
@@ -70,12 +56,18 @@ def generate_advice(prob, user_info):
                 "model": "llama-3.1-8b-instant",
                 "messages": [{"role": "user", "content": prompt}],
                 "temperature": 0.6
-            },
-            timeout=30
+            }
         )
 
-        ans = r.json()
-        print("🔥 RAW LLM 응답:", ans)
+        # ⭐ 반드시 넣어야 Render에서 오류 원인 추적 가능
+        print("🔥 RAW LLM status:", response.status_code)
+        print("🔥 RAW LLM text:", response.text)
+
+        # 실패 응답 방지
+        if response.status_code != 200:
+            return "AI 조언 생성 중 오류가 발생했습니다."
+
+        ans = response.json()
 
         if "choices" not in ans:
             return "AI 조언 생성 중 오류가 발생했습니다."
