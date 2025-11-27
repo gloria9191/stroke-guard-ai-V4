@@ -27,7 +27,16 @@ def generate_advice(prob, user_info):
     if not GROQ_API_KEY:
         print("❌ GROQ_API_KEY 없음")
         return "AI 조언 생성이 활성화되지 않았습니다."
-
+    user_text = f"""
+    성별: { '남성' if user_info['gender']==1 else '여성' }
+    나이: {user_info['age']}세
+    BMI: {user_info['bmi']}
+    수축기 혈압: {user_info['sbp']}
+    이완기 혈압: {user_info['dbp']}
+    공복 혈당: {user_info['glucose']}
+    흡연 여부: {'예' if user_info['smoking']==1 else '아니오'}
+    음주 여부: {'예' if user_info['drinking']==1 else '아니오'}
+    """
     prompt = f"""
     사용자의 뇌졸중 발병 확률은 {prob}% 입니다.
 
@@ -62,7 +71,7 @@ def generate_advice(prob, user_info):
                 "messages": [{"role": "user", "content": prompt}],
                 "temperature": 0.6
             },
-            timeout=20
+            timeout=30
         )
 
         ans = r.json()
