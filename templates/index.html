@@ -24,21 +24,33 @@
         .icon{margin-right:12px;background:linear-gradient(135deg,#54a0ff,#a29bfe);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 
         /* ⬇ 스크롤 힌트 (추가된 부분) */
-        .scroll-hint {
-            position:absolute;
-            bottom:40px;
-            left:0;
-            right:0;
-            text-align:center;
-            font-size:1.2rem;
-            opacity:0.7;
-            animation:fadeMove 1.8s infinite;
+        /* 스크롤 힌트 애니메이션 */
+        .animated-hint {
+            position: absolute;
+            bottom: 40px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 1.2rem;
+            opacity: 0.75;
+            animation: scrollFade 1.8s infinite ease-in-out;
         }
-        @keyframes fadeMove {
-            0%{opacity:0.3; transform:translateY(0);}
-            50%{opacity:1; transform:translateY(5px);}
-            100%{opacity:0.3; transform:translateY(0);}
+        
+        @keyframes scrollFade {
+            0% {
+                opacity: 0.3;
+                transform: translateY(0);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(6px);
+            }
+            100% {
+                opacity: 0.3;
+                transform: translateY(0);
+            }
         }
+
 
         .card{background:rgba(255,255,255,0.95);color:#333;border-radius:28px;box-shadow:0 20px 60px rgba(80,40,150,0.2);}
         .btn-opt{width:48%;padding:22px;font-size:1.4rem;border:3px solid #6c5ce7;border-radius:20px;background:white;color:#6c5ce7;font-weight:700}
@@ -64,6 +76,8 @@
             <span class="badge">뇌졸중 위험 신호 조기 감지</span>
             <span class="badge">실시간 AI 건강 코칭</span>
         </div>
+        <div class="scroll-hint animated-hint">⬇ 아래로 스크롤하여 설문을 시작하세요</div>
+
 
         <p class="tagline"><span class="icon">SYNAPSE</span>작은 변화가 큰 미래를 만듭니다</p>
     </div>
@@ -74,8 +88,6 @@
 
 
 
-<!-- 스크롤 힌트 복구 -->
-<p class="text-center mt-3" style="font-size:14px;color:#ccc;">⬇ 아래로 스크롤하여 설문을 시작하세요</p>
 
 
 <!-- SURVEY -->
