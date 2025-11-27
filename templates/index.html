@@ -363,7 +363,10 @@ document.getElementById("submit").onclick = () => {
         if (!res.prob) res.prob = 0;
         if (!res.risk_text) res.risk_text = "저위험";
         if (!res.risk_class) res.risk_class = "result-low";
-        if (!res.advice) res.advice = "AI 조언을 불러오지 못했습니다.";
+        if (res.advice === undefined || res.advice === null) {
+        res.advice = "AI 조언을 불러오지 못했습니다.";
+        }
+
 
         const card = document.getElementById("resultCard");
         card.classList.remove("result-high","result-low");
