@@ -47,6 +47,51 @@
         .btn-step{background:linear-gradient(135deg,#a29bfe,#6c5ce7);color:white;padding:18px 70px;border-radius:50px;font-size:1.4rem;font-weight:700}
         .progress{height:12px;border-radius:12px;background:#e0e0e0}
         .progress-bar{background:linear-gradient(90deg,#a29bfe,#6c5ce7)}
+        /* 고위험/저위험 색상 복구 */
+        .result-high {
+            background: #ff6b6b !important;
+            color: white !important;
+        }
+        
+        .result-low {
+            background: #6c5ce7 !important;
+            color: white !important;
+        }
+        
+        /* 결과 텍스트(LLM 조언) 가독성 */
+        .result-text-box {
+            font-size: 1.3rem;
+            line-height: 1.7;
+            margin-top: 20px;
+            opacity: 0.95;
+        }
+         /* 결과 카드 기본 배경(로딩 중에도 하얀 화면 방지) */
+        #resultCard {
+            background: rgba(255,255,255,0.05);
+            color: white;
+            border-radius: 30px;
+        }
+        /* 고위험/저위험 색상 복구 */
+        .result-high {
+            background: #ff6b6b !important;
+            color: white !important;
+        }
+        
+        .result-low {
+            background: #6c5ce7 !important;
+            color: white !important;
+        }
+        
+        /* 결과 텍스트(LLM 조언) 가독성 */
+        .result-text-box {
+            font-size: 1.3rem;
+            line-height: 1.7;
+            margin-top: 20px;
+            opacity: 0.95;
+        }
+       
+
+        
     </style>
 </head>
 
@@ -66,7 +111,7 @@
             <span class="badge">실시간 AI 건강 코칭</span>
         </div>
 
-        <div class="scroll-hint animated-hint" style="bottom: 20px;">
+        <div class="scroll-hint animated-hint" style="bottom: 10px;">
             ⬇ 아래로 스크롤하여 설문을 시작하세요
         </div>
 
