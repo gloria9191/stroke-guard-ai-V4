@@ -61,7 +61,7 @@ def generate_advice(prob, user_info):
 
     try:
         r = requests.post(
-            "https://api.groq.com/openai/v1/chat/completions",
+            "https://api.groq.com/v1/chat/completions",
             headers={
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {GROQ_API_KEY}"
@@ -75,7 +75,7 @@ def generate_advice(prob, user_info):
         )
 
         ans = r.json()
-        print("🔥 GROQ 응답:", ans)
+        print("🔥 RAW LLM 응답:", ans)
 
         if "choices" not in ans:
             return "AI 조언 생성 중 오류가 발생했습니다."
@@ -144,6 +144,7 @@ def predict():
         })
 
     except Exception as e:
+        print("❌ LLM 요청 실패:", e)
         return jsonify({"error": f"서버 오류: {str(e)}"})
 
 
