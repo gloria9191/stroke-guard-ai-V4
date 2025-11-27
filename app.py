@@ -121,7 +121,7 @@ def predict():
             "prob": prob_percent,
             "risk_text": risk_text,
             "risk_class": risk_class,
-            "advice": advice
+            "advice": advice_text
         })
 
     except Exception as e:
