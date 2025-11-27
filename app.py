@@ -44,24 +44,22 @@ def generate_advice(prob):
 
     try:
         r = requests.post(
-            "https://api.groq.com/v1/chat/completions",  # ← 최신 공식 엔드포인트
+            "https://api.groq.com/openai/v1/chat/completions",
             headers={
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {GROQ_API_KEY}"
             },
             json={
                 "model": "llama-3.1-8b-instant",
-                "messages": [{"role": "user", "content": prompt}],
-                "temperature": 0.6
+                "messages":[{"role":"user","content":prompt}],
+                "temperature":0.6
             },
-            timeout=30   # ← Render 시간 늘림
+            timeout=20
         )
 
         ans = r.json()
+        print("🔥 GROQ 응답:", ans)
 
-        print("🔥 GROQ 응답:", ans)   # ← Render 로그에 찍힘
-
-        # 응답 구조 검증
         if "choices" not in ans:
             return "AI 조언 생성 중 오류가 발생했습니다."
 
@@ -70,7 +68,6 @@ def generate_advice(prob):
     except Exception as e:
         print("❌ LLM 요청 실패:", e)
         return "AI 조언 생성 중 오류가 발생했습니다."
-
 
 
 # ------------------------------------------------
