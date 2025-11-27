@@ -12,7 +12,7 @@
         body {margin:0;background:#0f0f23;color:white;font-family:'Noto Sans KR',sans-serif;overflow-x:hidden}
         .hero{min-height:100vh;background:linear-gradient(135deg,#0f0f23,#1a1a3a,#2d1b69);display:flex;align-items:center;justify-content:center;position:relative}
         .hero::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:url('https://images.unsplash.com/photo-1638207213803-3c093c7cd506?ixlib=rb-4.0.3&auto=format&fit=crop&q=80') center/cover;opacity:0.15}
-        .hero-content{position:relative;z-index:2;max-width:900px;text-align:center;padding:0 20px}
+        .hero-content{position:relative;z-index:2;max-width:900px;text-align:center;padding:0 20px;}
         .title{font-size:clamp(4rem,10vw,7rem);font-weight:900;letter-spacing:-3px;margin:0 0 1.5rem;line-height:0.9;font-family:'Yoon Gothic 700',sans-serif}
         .stroke{background:linear-gradient(90deg,#ff6b6b,#feca57);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
         .guard{color:#a29bfe;text-shadow:0 0 30px rgba(162,155,254,0.6)}
@@ -47,6 +47,21 @@
         .btn-step{background:linear-gradient(135deg,#a29bfe,#6c5ce7);color:white;padding:18px 70px;border-radius:50px;font-size:1.4rem;font-weight:700}
         .progress{height:12px;border-radius:12px;background:#e0e0e0}
         .progress-bar{background:linear-gradient(90deg,#a29bfe,#6c5ce7)}
+        .hero-content {
+            padding-top: 120px;
+        }
+        
+        .tagline {
+            margin-top: 60px !important;
+            margin-bottom: 40px !important;
+        }
+        
+        .animated-hint {
+            font-size: 0.9rem !important;
+            bottom: 10px !important;
+            opacity: 0.8;
+        }
+
         /* 고위험/저위험 색상 복구 */
         .result-high {
             background: #ff6b6b !important;
