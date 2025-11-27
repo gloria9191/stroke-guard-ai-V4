@@ -23,7 +23,7 @@ THRESHOLD = 0.66
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 print("🔑 Loaded GROQ_API_KEY:", GROQ_API_KEY)
 
-def generate_advice(prob):
+def generate_advice(prob, user_info):
     if not GROQ_API_KEY:
         print("❌ GROQ_API_KEY 없음")
         return "AI 조언 생성이 활성화되지 않았습니다."
@@ -31,15 +31,23 @@ def generate_advice(prob):
     prompt = f"""
     사용자의 뇌졸중 발병 확률은 {prob}% 입니다.
 
-    한국 성인 기준으로,
-    - 식습관
-    - 운동 습관
-    - 혈압 및 혈당 관리
-    - 주의해야 할 위험 신호
-    - 금연/절주
+    아래는 사용자의 건강 정보입니다:
+    - 성별: {"남성" if user_info['gender']==1 else "여성"}
+    - 나이: {user_info['age']}세
+    - BMI: {user_info['bmi']}
+    - 수축기 혈압(sbp): {user_info['sbp']}
+    - 이완기 혈압(dbp): {user_info['dbp']}
+    - 공복 혈당(glucose): {user_info['glucose']} mg/dL
+    - 흡연 여부: {"흡연" if user_info['smoking']==1 else "비흡연"}
+    - 음주 여부: {"음주" if user_info['drinking']==1 else "비음주"}
 
-    위 항목을 바탕으로 5줄 이내 한국어 문장만 작성하세요.
-    외국어·이모지 금지.
+    위 정보를 종합해,
+    한국 성인 기준 건강관리 조언을 5줄 이내 한국어 문장만으로 작성하세요.
+
+    반드시 다음 원칙을 지킬 것:
+    - 외국어, 이모지, 특수문자 금지
+    - 너무 원론적인 말 금지
+    - 입력된 수치(BMI, 혈압, 혈당)에 근거한 개인 맞춤형 조언 포함
     """
 
     try:
@@ -51,8 +59,8 @@ def generate_advice(prob):
             },
             json={
                 "model": "llama-3.1-8b-instant",
-                "messages":[{"role":"user","content":prompt}],
-                "temperature":0.6
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.6
             },
             timeout=20
         )
@@ -68,6 +76,7 @@ def generate_advice(prob):
     except Exception as e:
         print("❌ LLM 요청 실패:", e)
         return "AI 조언 생성 중 오류가 발생했습니다."
+
 
 
 # ------------------------------------------------
