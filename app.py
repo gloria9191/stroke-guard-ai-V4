@@ -11,6 +11,7 @@ app = Flask(__name__)
 # ------------------------------------------------
 print("🔄 Loading stroke_model.pkl ...")
 model = joblib.load("stroke_model.pkl")
+model = raw["model"]  
 print("✅ 모델 로드 완료")
 
 # 🔥 너 모델의 실제 최적 threshold = 0.66
