@@ -64,8 +64,12 @@ def generate_advice(prob, user_info):
             timeout=15
         )
         ans = r.json()
+        if "choices" in ans and len(ans["choices"]) > 0:
+            return ans["choices"][0]["message"]["content"].strip()
+            
         return ans["choices"][0]["message"]["content"].strip()
     except Exception:
+        print("LLM ERROR:", e)
         return "AI 조언 생성 중 오류가 발생했습니다."
 
 
