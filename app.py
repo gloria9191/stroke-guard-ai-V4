@@ -10,8 +10,18 @@ app = Flask(__name__)
 # 1) 모델 로드
 # ------------------------------------------------
 print("🔄 Loading stroke_model.pkl ...")
-model = joblib.load("stroke_model.pkl")
-model = raw["model"]  
+raw = joblib.load("stroke_model.pkl")
+
+# dict 형태라면 model만 꺼내기
+if isinstance(raw, dict) and "model" in raw:
+    model = raw["model"]
+else:
+    model = raw
+
+print("모델 타입:", type(model))
+print("dict 여부:", isinstance(raw, dict))
+print("model keys:", raw.keys() if isinstance(raw, dict) else "None")
+
 print("✅ 모델 로드 완료")
 
 # 🔥 너 모델의 실제 최적 threshold = 0.66
