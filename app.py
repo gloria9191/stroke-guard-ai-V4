@@ -62,7 +62,7 @@ def generate_advice(prob, user_info):
 
     try:
         r = requests.post(
-            "https://api.groq.com/v1/chat/completions",
+            "https://api.groq.com/openai/v1/chat/completions",
             headers={
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {GROQ_API_KEY}"
