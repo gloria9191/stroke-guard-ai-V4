@@ -23,7 +23,6 @@
         .tagline{font-size:1.6rem;font-weight:400;opacity:0.9}
         .icon{margin-right:12px;background:linear-gradient(135deg,#54a0ff,#a29bfe);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 
-        /* ⬇ 스크롤 힌트 (추가된 부분) */
         /* 스크롤 힌트 애니메이션 */
         .animated-hint {
             position: absolute;
@@ -37,20 +36,10 @@
         }
         
         @keyframes scrollFade {
-            0% {
-                opacity: 0.3;
-                transform: translateY(0);
-            }
-            50% {
-                opacity: 1;
-                transform: translateY(6px);
-            }
-            100% {
-                opacity: 0.3;
-                transform: translateY(0);
-            }
+            0% {opacity: 0.3; transform: translateY(0);}
+            50% {opacity: 1; transform: translateY(6px);}
+            100% {opacity: 0.3; transform: translateY(0);}
         }
-
 
         .card{background:rgba(255,255,255,0.95);color:#333;border-radius:28px;box-shadow:0 20px 60px rgba(80,40,150,0.2);}
         .btn-opt{width:48%;padding:22px;font-size:1.4rem;border:3px solid #6c5ce7;border-radius:20px;background:white;color:#6c5ce7;font-weight:700}
@@ -76,15 +65,12 @@
             <span class="badge">뇌졸중 위험 신호 조기 감지</span>
             <span class="badge">실시간 AI 건강 코칭</span>
         </div>
-        <div class="scroll-hint animated-hint">⬇ 아래로 스크롤하여 설문을 시작하세요</div>
+
+        <div class="animated-hint">⬇ 아래로 스크롤하여 설문을 시작하세요</div>
+
         <p class="tagline"><span class="icon">SYNAPSE</span>작은 변화가 큰 미래를 만듭니다</p>
-        
-    </div> 
-    
+    </div>
 </div>
-
-
-
 
 
 <!-- SURVEY -->
@@ -99,7 +85,7 @@
 
                 <!-- STEP 1 -->
                 <div id="step1" class="text-center mb-4 step-block">
-                    <button class="btn-opt" data-value="1">남성</button>
+                    <button class="btn-opt active" data-value="1">남성</button>
                     <button class="btn-opt" data-value="0">여성</button>
                 </div>
 
@@ -135,18 +121,15 @@
                            placeholder="공복 혈당 (예: 110)">
                 </div>
 
-
                 <!-- STEP 7 -->
                 <div id="step7" class="d-none step-block text-center mb-4">
-                    
-                    <button class="btn-opt" data-value="0">비흡연</button>
+                    <button class="btn-opt active" data-value="0">비흡연</button>
                     <button class="btn-opt" data-value="1">흡연</button>
                 </div>
 
                 <!-- STEP 8 -->
                 <div id="step8" class="d-none step-block text-center mb-4">
-                    
-                    <button class="btn-opt" data-value="0">주 1회 미만</button>
+                    <button class="btn-opt active" data-value="0">주 1회 미만</button>
                     <button class="btn-opt" data-value="1">주 1회 이상</button>
                 </div>
 
@@ -162,6 +145,7 @@
 </div>
 
 
+
 <!-- RESULT -->
 <div class="container my-5 d-none" id="result">
     <div class="row justify-content-center">
@@ -172,7 +156,7 @@
 </div>
 
 <script>
-/* 버튼 중복 문제 해결 → 각 step 내부만 이벤트 적용 */
+/* 그룹별 버튼 active 처리 */
 document.querySelectorAll(".step-block .btn-opt").forEach(btn => {
     btn.addEventListener("click", function () {
         const group = this.closest(".step-block").querySelectorAll(".btn-opt");
@@ -182,10 +166,14 @@ document.querySelectorAll(".step-block .btn-opt").forEach(btn => {
 });
 
 const questions = [
-    "성별을 선택해주세요", "만 나이를 입력해주세요",
-    "키와 몸무게를 입력해주세요", "수축기 혈압을 입력해주세요",
-    "이완기 혈압을 입력해주세요", "공복 혈당을 입력해주세요",
-    "흡연 여부를 선택해주세요", "음주 여부를 선택해주세요)"
+    "성별을 선택해주세요", 
+    "만 나이를 입력해주세요",
+    "키와 몸무게를 입력해주세요", 
+    "수축기 혈압을 입력해주세요",
+    "이완기 혈압을 입력해주세요", 
+    "공복 혈당을 입력해주세요",
+    "흡연 여부를 선택해주세요", 
+    "음주 여부를 선택해주세요"
 ];
 
 let step = 1;
@@ -193,9 +181,8 @@ const data = {};
 
 document.getElementById("next").onclick = () => {
 
-    // 값 수집 단계
     if (step === 1)
-        data.gender = Number(document.querySelector("#step1 .active")?.dataset.value);
+        data.gender = Number(document.querySelector("#step1 .active").dataset.value);
 
     if (step === 2) {
         let v = document.getElementById("age").value;
@@ -229,12 +216,14 @@ document.getElementById("next").onclick = () => {
     }
 
     if (step === 7)
-        data.smoking = Number(document.querySelector("#step7 .active")?.dataset.value);
+        data.smoking = Number(document.querySelector("#step7 .active").dataset.value);
 
     if (step === 8)
-        data.drinking = Number(document.querySelector("#step8 .active")?.dataset.value);
+        data.drinking = Number(document.querySelector("#step8 .active").dataset.value);
 
-    // 실제 페이지 이동
+
+
+    // 페이지 이동
     if (step < 8) {
         document.getElementById(`step${step}`).classList.add("d-none");
         step++;
@@ -267,7 +256,12 @@ document.getElementById("prev").onclick = () => {
 
 document.getElementById("submit").onclick = () => {
 
-    /* 예측 페이지 전환 */
+    // undefined 방지 검증
+    if (Object.keys(data).length < 8) {
+        alert("모든 항목을 입력해주세요.");
+        return location.reload();
+    }
+
     document.getElementById("survey").classList.add("d-none");
     document.getElementById("result").classList.remove("d-none");
 
@@ -276,7 +270,6 @@ document.getElementById("submit").onclick = () => {
         <div class="spinner-border text-light my-4" style="width:4rem;height:4rem"></div>
     `;
 
-    /* 예측 요청 */
     fetch("/predict", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
@@ -284,7 +277,6 @@ document.getElementById("submit").onclick = () => {
     })
         .then(r => r.json())
         .then(res => {
-
             const card = document.getElementById("resultCard");
             card.classList.remove("result-high","result-low");
             card.classList.add(res.risk_class);
@@ -303,12 +295,7 @@ document.getElementById("submit").onclick = () => {
             `;
         });
 };
-    // 기본 선택값 자동 활성화 (undefined 방지)
-document.querySelector("#step1 .btn-opt")?.classList.add("active");
-document.querySelector("#step7 .btn-opt")?.classList.add("active");
-document.querySelector("#step8 .btn-opt")?.classList.add("active");
 </script>
-
 
 </body>
 </html>
