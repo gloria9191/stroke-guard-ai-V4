@@ -66,9 +66,8 @@
             <span class="badge">실시간 AI 건강 코칭</span>
         </div>
 
-        <div class="animated-hint">⬇ 아래로 스크롤하여 설문을 시작하세요</div>
-
         <p class="tagline"><span class="icon">SYNAPSE</span>작은 변화가 큰 미래를 만듭니다</p>
+        <div class="animated-hint">⬇ 아래로 스크롤하여 설문을 시작하세요</div>
     </div>
 </div>
 
@@ -255,12 +254,24 @@ document.getElementById("prev").onclick = () => {
 };
 
 document.getElementById("submit").onclick = () => {
-
+    
     // undefined 방지 검증
-    if (Object.keys(data).length < 8) {
-        alert("모든 항목을 입력해주세요.");
-        return location.reload();
+    
+    // undefined 값 방지용 체크
+    if (
+        data.gender === undefined ||
+        data.age === undefined ||
+        data.bmi === undefined ||
+        data.sbp === undefined ||
+        data.dbp === undefined ||
+        data.glucose === undefined ||
+        data.smoking === undefined ||
+        data.drinking === undefined
+    ) {
+        alert("입력되지 않은 항목이 있습니다.");
+        return;
     }
+
 
     document.getElementById("survey").classList.add("d-none");
     document.getElementById("result").classList.remove("d-none");
