@@ -44,20 +44,25 @@ def generate_advice(prob, user_info):
         return "⚠️ AI 조언을 불러올 수 없습니다."
 
     prompt = f"""
-    사용자의 뇌졸중 발병 확률은 {prob}%입니다.
-
+    사용자의 건강 정보를 기반으로 의료 전문가의 관점에서 생활습관 개선 조언을 작성하세요.
+    외국어 금지.
+    한자 금지.
+    기본 문장 부호(.,!? ) 외 특수기호 금지.
+    지나치게 어려운 표현 금지.
+    성별, 만 나이, BMI, 혈압, 혈당, 흡연, 음주 정보를 반영할 것.
+    의사가 직접 설명해주는 말투로 5줄 이내로 작성하세요.
+    
     사용자 정보:
-    - 성별: {user_info['gender']}
-    - 나이: {user_info['age']}
-    - BMI: {user_info['bmi']}
-    - 수축기 혈압: {user_info['sbp']}
-    - 이완기 혈압: {user_info['dbp']}
-    - 공복혈당: {user_info['glucose']}
-    - 흡연 여부: {user_info['smoking']}
-    - 음주 여부: {user_info['drinking']}
-
-    위 정보를 바탕으로 5줄 이내로 생활습관 개선 조언을 알려주세요.
+    성별: {gender}
+    나이: {age}
+    BMI: {bmi}
+    수축기 혈압: {sbp}
+    이완기 혈압: {dbp}
+    공복 혈당: {glucose}
+    흡연 여부: {smoking}
+    음주 빈도: {drinking}
     """
+
 
     try:
         r = requests.post(
